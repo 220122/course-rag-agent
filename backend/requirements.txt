@@ -1,0 +1,15 @@
+# ===== 课程知识问答 RAG 智能体 - 后端依赖 =====
+# Python 3.10+
+
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+python-multipart==0.0.9          # 文件上传支持
+pydantic==2.9.2
+pydantic-settings==2.5.2         # 读取 .env 配置
+python-dotenv==1.0.1
+
+chromadb==0.5.5                  # 本地向量数据库
+openai==1.51.0                   # 豆包 Ark 接口兼容 OpenAI SDK
+
+python-docx==1.1.2               # 解析 Word(.docx)
+PyPDF2==3.0.1                    # 解析 PDF
