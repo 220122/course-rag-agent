@@ -9,8 +9,9 @@ from openai import OpenAI
 from config import settings
 
 # OpenAI 兼容客户端，指向火山方舟地址
+# 未配置 Key 时使用占位符，保证服务可启动；真正调用时由业务层检查并给出友好提示
 client = OpenAI(
-    api_key=settings.ark_api_key,
+    api_key=settings.ark_api_key or "MISSING_API_KEY",
     base_url=settings.ark_base_url,
 )
 

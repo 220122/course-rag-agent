@@ -18,6 +18,15 @@ import evaluator
 REFUSAL_TEXT = "当前课程知识库中没有该知识点，无法作答。"
 
 
+def _check_api_key() -> None:
+    """检查豆包 API Key 是否已配置，未配置则给出明确的中文错误。"""
+    if not settings.ark_api_key:
+        raise RuntimeError(
+            "未配置豆包 API Key，请先在 backend 目录下把 .env.example 复制为 .env "
+            "并填入 ARK_API_KEY（可运行「① 首次安装」脚本，会自动打开配置）"
+        )
+
+
 # ===================== 知识库管理 =====================
 
 def add_document(file_path: str, filename: str) -> dict:
@@ -27,6 +36,7 @@ def add_document(file_path: str, filename: str) -> dict:
     返回文档信息（doc_id、文件名、块数量）。
     """
     doc_id = str(uuid.uuid4())
+    _check_api_key()
 
     # 1. 解析文档纯文本
     text = parse_document(file_path)
@@ -108,6 +118,7 @@ def answer_question(question: str) -> dict:
     3. 有有效片段 -> 拼接提示词调用豆包生成回答；
     4. 生成并保存评测记录。
     """
+    _check_api_key()
     hits = retrieve(question)
     retrieved = len(hits) > 0
 

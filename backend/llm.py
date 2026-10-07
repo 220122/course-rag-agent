@@ -7,7 +7,7 @@ from openai import OpenAI
 from config import settings
 
 client = OpenAI(
-    api_key=settings.ark_api_key,
+    api_key=settings.ark_api_key or "MISSING_API_KEY",
     base_url=settings.ark_base_url,
 )
 
