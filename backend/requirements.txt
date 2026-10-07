@@ -10,6 +10,7 @@ pydantic-settings>=2.5.0       # 读取 .env 配置
 
 chromadb>=0.5.5                # 本地向量数据库
 openai>=1.51.0                 # 豆包 Ark 接口兼容 OpenAI SDK
+httpx>=0.27.0                  # 多模态向量化接口（/embeddings/multimodal）直连
 
 python-docx>=1.1.2             # 解析 Word(.docx)
 PyPDF2>=3.0.1                  # 解析 PDF

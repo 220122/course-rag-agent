@@ -15,6 +15,16 @@ class Settings(BaseSettings):
     chat_model: str = "doubao-pro-32k"
     embedding_model: str = "doubao-embedding-text-240715"
 
+    # 向量化接口形态：
+    #   text       => 标准 /embeddings 接口，一次请求可批量向量化（文本向量化模型）
+    #   multimodal => /embeddings/multimodal 接口，一次请求只出一个融合向量
+    #                 （doubao-embedding-vision 等多模态模型必须用这个）
+    #   auto       => 先试 text，若模型不支持标准接口则自动回退到 multimodal
+    embedding_mode: str = "auto"
+
+    # multimodal 模式下并发请求数（每个文本块一次请求，并发可显著提速）
+    embedding_concurrency: int = 8
+
     # 本地存储路径
     chroma_dir: str = "./data/chroma"
     upload_dir: str = "./data/uploads"
