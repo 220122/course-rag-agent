@@ -1,29 +1,29 @@
 @echo off
-chcp 65001 >nul
-title RAG-å¯åŠ¨å™¨
+chcp 936 >nul
+title RAG-Æô¶¯Æ÷
 cd /d %~dp0
 
-REM æœªå®‰è£…åˆ™æç¤ºå…ˆè¿è¡Œå®‰è£…è„šæœ¬
+REM Î´°²×°ÔòÌáÊ¾ÏÈÔËÐÐ°²×°½Å±¾
 if not exist backend\.venv (
-    echo æ£€æµ‹åˆ°å°šæœªå®‰è£…çŽ¯å¢ƒï¼Œè¯·å…ˆåŒå‡»è¿è¡Œã€Œâ‘  é¦–æ¬¡å®‰è£…ï¼ˆåŒå‡»æˆ‘ï¼‰.batã€
+    echo ¼ì²âµ½ÉÐÎ´°²×°»·¾³£¬ÇëÏÈË«»÷ÔËÐÐ¡¸¢Ù Ê×´Î°²×°£¨Ë«»÷ÎÒ£©.bat¡¹
     pause
     exit /b 1
 )
 
-echo æ­£åœ¨å¯åŠ¨åŽç«¯æœåŠ¡ï¼ˆçª—å£ 1ï¼‰...
-start "RAG-Backend" cmd /k "chcp 65001 >nul && cd /d %~dp0backend && call .venv\Scripts\activate.bat && uvicorn main:app --host 0.0.0.0 --port 8000"
+echo ÕýÔÚÆô¶¯ºó¶Ë·þÎñ£¨´°¿Ú 1£©...
+start "RAG-Backend" cmd /k "cd /d %~dp0backend && call .venv\Scripts\activate.bat && uvicorn main:app --host 0.0.0.0 --port 8000"
 
-echo æ­£åœ¨å¯åŠ¨å‰ç«¯æœåŠ¡ï¼ˆçª—å£ 2ï¼‰...
-start "RAG-Frontend" cmd /k "chcp 65001 >nul && cd /d %~dp0frontend && npm run dev"
+echo ÕýÔÚÆô¶¯Ç°¶Ë·þÎñ£¨´°¿Ú 2£©...
+start "RAG-Frontend" cmd /k "cd /d %~dp0frontend && npm run dev"
 
 echo.
-echo ç­‰å¾…æœåŠ¡å°±ç»ªï¼ˆçº¦ 8 ç§’ï¼‰...
+echo µÈ´ý·þÎñ¾ÍÐ÷£¨Ô¼ 8 Ãë£©...
 timeout /t 8 /nobreak >nul
 
-echo æ­£åœ¨æ‰“å¼€æµè§ˆå™¨...
+echo ÕýÔÚ´ò¿ªä¯ÀÀÆ÷...
 start http://localhost:5173
 
 echo.
-echo å·²å¯åŠ¨ï¼ä½¿ç”¨å®Œæ¯•åŽè¯·åŒå‡»ã€Œâ‘¢ åœæ­¢é¡¹ç›®ï¼ˆåŒå‡»æˆ‘ï¼‰.batã€å…³é—­æœåŠ¡ã€‚
+echo ÒÑÆô¶¯£¡Ê¹ÓÃÍê±ÏºóÇëË«»÷¡¸¢Û Í£Ö¹ÏîÄ¿£¨Ë«»÷ÎÒ£©.bat¡¹¹Ø±Õ·þÎñ¡£
 timeout /t 3 /nobreak >nul
 exit

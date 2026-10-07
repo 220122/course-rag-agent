@@ -1,14 +1,14 @@
 @echo off
-chcp 65001 >nul
-title RAG-åœæ­¢å™¨
+chcp 936 >nul
+title RAG-Í£Ö¹Æ÷
 
-echo æ­£åœ¨å…³é—­åŽç«¯æœåŠ¡...
+echo ÕýÔÚ¹Ø±Õºó¶Ë·þÎñ...
 taskkill /F /T /FI "WINDOWTITLE eq RAG-Backend*" >nul 2>&1
 
-echo æ­£åœ¨å…³é—­å‰ç«¯æœåŠ¡...
+echo ÕýÔÚ¹Ø±ÕÇ°¶Ë·þÎñ...
 taskkill /F /T /FI "WINDOWTITLE eq RAG-Frontend*" >nul 2>&1
 
 echo.
-echo æœåŠ¡å·²å…¨éƒ¨å…³é—­ã€‚
+echo ·þÎñÒÑÈ«²¿¹Ø±Õ¡£
 timeout /t 2 /nobreak >nul
 exit
