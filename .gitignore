@@ -17,3 +17,6 @@ frontend/dist/
 # IDE
 .idea/
 .vscode/
+
+# 本机专用的辅助脚本（只放在本地使用，不进仓库）
+④ 推送到GitHub（双击我）.bat
