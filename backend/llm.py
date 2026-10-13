@@ -1,15 +1,33 @@
 """
 大语言模型模块
-封装豆包（火山方舟）对话补全接口，强制模型只能依据检索到的课程资料作答。
+
+对话模型支持两个 provider（由 .env 的 CHAT_PROVIDER 决定）：
+- deepseek => DeepSeek 官方接口（默认）
+- ark      => 火山方舟（豆包）
+
+无论用哪家，系统提示词都会强制模型只能依据检索到的课程资料作答。
 """
 from openai import OpenAI
 
 from config import settings
 
-client = OpenAI(
-    api_key=settings.ark_api_key or "MISSING_API_KEY",
-    base_url=settings.ark_base_url,
-)
+
+def _build_client() -> OpenAI:
+    """按配置的 provider 构造 OpenAI 兼容客户端。"""
+    provider = (settings.chat_provider or "deepseek").strip().lower()
+    if provider == "ark":
+        return OpenAI(
+            api_key=settings.ark_api_key or "MISSING_API_KEY",
+            base_url=settings.ark_base_url,
+        )
+    # 默认 DeepSeek
+    return OpenAI(
+        api_key=settings.deepseek_api_key or "MISSING_API_KEY",
+        base_url=settings.deepseek_base_url,
+    )
+
+
+client = _build_client()
 
 # 系统提示词：限定角色与回答边界，禁止编造
 SYSTEM_PROMPT = (
@@ -33,7 +51,17 @@ def build_user_prompt(question: str, contexts: list[str]) -> str:
 
 
 def generate_answer(question: str, contexts: list[str]) -> str:
-    """调用豆包对话接口生成回答。"""
+    """
+    调用对话接口生成回答。
+
+    RAG 场景下答案已被检索资料约束，思考模式（thinking）只会显著增加首字延迟，
+    因此默认传 thinking.type=disabled；如需更强推理可把 CHAT_THINKING 设为 true。
+    DeepSeek 与火山方舟都接受该参数，写法一致。
+    """
+    kwargs: dict = {}
+    if not settings.chat_thinking:
+        kwargs["extra_body"] = {"thinking": {"type": "disabled"}}
+
     resp = client.chat.completions.create(
         model=settings.chat_model,
         messages=[
@@ -41,5 +69,6 @@ def generate_answer(question: str, contexts: list[str]) -> str:
             {"role": "user", "content": build_user_prompt(question, contexts)},
         ],
         temperature=0.3,  # 低温度，降低自由发挥
+        **kwargs,
     )
-    return resp.choices[0].message.content.strip()
+    return (resp.choices[0].message.content or "").strip()

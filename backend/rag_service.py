@@ -18,12 +18,36 @@ import evaluator
 REFUSAL_TEXT = "当前课程知识库中没有该知识点，无法作答。"
 
 
-def _check_api_key() -> None:
-    """检查豆包 API Key 是否已配置，未配置则给出明确的中文错误。"""
-    if not settings.ark_api_key:
+def _check_embedding_key() -> None:
+    """
+    检查「向量化」所需的 Key。
+
+    本地离线向量化不需要任何 Key（默认配置），所以入库通常不会因为缺 Key 而失败；
+    只有把 EMBEDDING_PROVIDER 设为 ark 时才需要火山方舟的 Key。
+    """
+    if (settings.embedding_provider or "local").strip().lower() == "ark":
+        if not settings.ark_api_key:
+            raise RuntimeError(
+                "向量化使用了火山方舟（EMBEDDING_PROVIDER=ark），"
+                "但未配置 ARK_API_KEY。请在 backend/.env 中填写，"
+                "或把 EMBEDDING_PROVIDER 改为 local 使用本地离线模型（无需任何 Key）"
+            )
+
+
+def _check_chat_key() -> None:
+    """检查「对话模型」所需的 Key（只有问答时才需要）。"""
+    chat = (settings.chat_provider or "deepseek").strip().lower()
+    if chat == "ark":
+        if not settings.ark_api_key:
+            raise RuntimeError(
+                "对话模型使用了火山方舟（CHAT_PROVIDER=ark），"
+                "但未配置 ARK_API_KEY，请在 backend/.env 中填写"
+            )
+    elif not settings.deepseek_api_key:
         raise RuntimeError(
-            "未配置豆包 API Key，请先在 backend 目录下把 .env.example 复制为 .env "
-            "并填入 ARK_API_KEY（可运行「① 首次安装」脚本，会自动打开配置）"
+            "未配置 DeepSeek API Key：请在 backend/.env 中填写 DEEPSEEK_API_KEY"
+            "（申请地址 https://platform.deepseek.com/api_keys）。"
+            "向量化用的是本地离线模型，不受影响"
         )
 
 
@@ -36,7 +60,7 @@ def add_document(file_path: str, filename: str) -> dict:
     返回文档信息（doc_id、文件名、块数量）。
     """
     doc_id = str(uuid.uuid4())
-    _check_api_key()
+    _check_embedding_key()
 
     # 1. 解析文档纯文本
     text = parse_document(file_path)
@@ -45,7 +69,7 @@ def add_document(file_path: str, filename: str) -> dict:
     if not chunks:
         raise ValueError("文档内容为空或无法提取文本")
 
-    # 3. 写入向量库（embedding 由 DoubaoEmbeddingFunction 自动完成）
+    # 3. 写入向量库（embedding 由当前 provider 的嵌入函数自动完成）
     collection.add(
         ids=[f"{doc_id}_{i}" for i in range(len(chunks))],
         documents=chunks,
@@ -118,7 +142,8 @@ def answer_question(question: str) -> dict:
     3. 有有效片段 -> 拼接提示词调用豆包生成回答；
     4. 生成并保存评测记录。
     """
-    _check_api_key()
+    _check_embedding_key()
+    _check_chat_key()
     hits = retrieve(question)
     retrieved = len(hits) > 0
 
